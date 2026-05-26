@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Plus, Inbox } from "lucide-react";
+import { Plus, Inbox, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { BotaoDocumento } from "@/components/documento/botao-documento";
 import {
   NovaTransacaoDialog,
@@ -21,8 +22,9 @@ const CATEGORIA_LABEL: Record<string, string> = {
 };
 
 export default function EntradasPage() {
-  const { transacoes, adicionar } = useTransacoes();
+  const { transacoes, adicionar, remover } = useTransacoes();
   const [dialogAberto, setDialogAberto] = useState(false);
+  const [idParaExcluir, setIdParaExcluir] = useState<string | null>(null);
 
   const entradas = transacoes.filter((t) => t.tipo === "entrada");
   const total = entradas.reduce((acc, e) => acc + e.valor, 0);
@@ -128,7 +130,7 @@ export default function EntradasPage() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.04 }}
-                    className="flex items-center justify-between rounded-md border border-border p-3"
+                    className="group flex items-center justify-between rounded-md border border-border p-3 transition-colors hover:border-primary/30"
                   >
                     <div className="flex min-w-0 items-center gap-3">
                       <BotaoDocumento path={entrada.documentoPath} />
@@ -143,9 +145,20 @@ export default function EntradasPage() {
                         </p>
                       </div>
                     </div>
-                    <p className="shrink-0 text-sm font-bold text-success">
-                      + {formatBRL(entrada.valor)}
-                    </p>
+                    <div className="flex shrink-0 items-center gap-3">
+                      <p className="text-sm font-bold text-success">
+                        + {formatBRL(entrada.valor)}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setIdParaExcluir(entrada.id)}
+                        className="rounded-md p-1.5 text-muted-foreground opacity-0 transition-all hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100 focus-visible:opacity-100"
+                        aria-label="Excluir entrada"
+                        title="Excluir"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </motion.li>
                 ))}
               </motion.ul>
@@ -159,6 +172,18 @@ export default function EntradasPage() {
         open={dialogAberto}
         onOpenChange={setDialogAberto}
         onSalvar={handleSalvar}
+      />
+
+      <ConfirmDialog
+        open={idParaExcluir !== null}
+        onOpenChange={(aberto) => !aberto && setIdParaExcluir(null)}
+        titulo="Excluir entrada?"
+        descricao="Essa ação não pode ser desfeita. O registro será removido permanentemente do banco de dados."
+        textoConfirmar="Excluir"
+        onConfirm={() => {
+          if (idParaExcluir) remover(idParaExcluir);
+          setIdParaExcluir(null);
+        }}
       />
     </div>
   );

@@ -10,6 +10,7 @@ import {
   Download,
   Printer,
   FileText,
+  Trash2,
 } from "lucide-react";
 import {
   Dialog,
@@ -30,6 +31,7 @@ interface ContaDetalhesDialogProps {
   conta: ContaParaPDF | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onExcluir?: (id: string) => void;
 }
 
 const STATUS_CONFIG = {
@@ -54,6 +56,7 @@ export function ContaDetalhesDialog({
   conta,
   open,
   onOpenChange,
+  onExcluir,
 }: ContaDetalhesDialogProps) {
   if (!conta) return null;
 
@@ -159,19 +162,31 @@ export function ContaDetalhesDialog({
           )}
         </motion.div>
 
-        <DialogFooter className="gap-2 sm:gap-2">
-          <Button
-            variant="outline"
-            onClick={() => imprimirContaPDF(conta)}
-            className="flex-1"
-          >
-            <Printer className="h-4 w-4" />
-            Imprimir
-          </Button>
-          <Button onClick={() => baixarContaPDF(conta)} className="flex-1">
-            <Download className="h-4 w-4" />
-            Baixar PDF
-          </Button>
+        <DialogFooter className="flex-col gap-2 sm:flex-col sm:gap-2">
+          <div className="flex w-full gap-2">
+            <Button
+              variant="outline"
+              onClick={() => imprimirContaPDF(conta)}
+              className="flex-1"
+            >
+              <Printer className="h-4 w-4" />
+              Imprimir
+            </Button>
+            <Button onClick={() => baixarContaPDF(conta)} className="flex-1">
+              <Download className="h-4 w-4" />
+              Baixar PDF
+            </Button>
+          </div>
+          {onExcluir && (
+            <Button
+              variant="destructive"
+              onClick={() => onExcluir(conta.id)}
+              className="w-full"
+            >
+              <Trash2 className="h-4 w-4" />
+              Excluir conta
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

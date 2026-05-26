@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Spinner } from "@/components/ui/spinner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { ContaDetalhesDialog } from "@/components/contas/conta-detalhes-dialog";
 import {
   NovaContaDialog,
@@ -20,10 +21,11 @@ import { useContas, type Conta } from "@/lib/store/contas-store";
 const hoje = startOfDay(new Date());
 
 export default function ContasAPagarPage() {
-  const { contas, carregando, adicionar } = useContas();
+  const { contas, carregando, adicionar, remover } = useContas();
   const [diaSelecionado, setDiaSelecionado] = useState<Date | undefined>(hoje);
   const [contaAberta, setContaAberta] = useState<Conta | null>(null);
   const [novaContaAberto, setNovaContaAberto] = useState(false);
+  const [idParaExcluir, setIdParaExcluir] = useState<string | null>(null);
 
   function handleSalvarNovaConta(input: NovaContaInput) {
     const dataVenc = new Date(input.data_vencimento + "T00:00:00");
@@ -280,12 +282,28 @@ export default function ContasAPagarPage() {
         }
         open={contaAberta !== null}
         onOpenChange={(aberto) => !aberto && setContaAberta(null)}
+        onExcluir={(id) => {
+          setContaAberta(null);
+          setIdParaExcluir(id);
+        }}
       />
 
       <NovaContaDialog
         open={novaContaAberto}
         onOpenChange={setNovaContaAberto}
         onSalvar={handleSalvarNovaConta}
+      />
+
+      <ConfirmDialog
+        open={idParaExcluir !== null}
+        onOpenChange={(aberto) => !aberto && setIdParaExcluir(null)}
+        titulo="Excluir conta?"
+        descricao="Essa ação não pode ser desfeita. A conta a pagar será removida permanentemente."
+        textoConfirmar="Excluir"
+        onConfirm={() => {
+          if (idParaExcluir) remover(idParaExcluir);
+          setIdParaExcluir(null);
+        }}
       />
     </div>
   );
