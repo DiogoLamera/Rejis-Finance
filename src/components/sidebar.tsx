@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "motion/react";
+import { toast } from "sonner";
 import {
   LayoutDashboard,
   TrendingUp,
@@ -11,6 +12,7 @@ import {
   LineChart,
   FileText,
   Wallet,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -26,6 +28,20 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    try {
+      const res = await fetch("/api/auth/logout", { method: "POST" });
+      if (!res.ok) throw new Error("Falha ao sair");
+      router.replace("/login");
+      router.refresh();
+    } catch (e) {
+      toast.error("Erro ao sair", {
+        description: e instanceof Error ? e.message : undefined,
+      });
+    }
+  }
 
   return (
     <motion.aside
@@ -88,8 +104,19 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div className="border-t border-white/10 p-4">
-        <ThemeToggle />
+      <div className="space-y-2 border-t border-white/10 p-4">
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+        >
+          <LogOut className="h-4 w-4" />
+          Sair
+        </button>
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs text-white/60">Tema</span>
+          <ThemeToggle />
+        </div>
       </div>
     </motion.aside>
   );

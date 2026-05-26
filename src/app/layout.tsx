@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
-import { Sidebar } from "@/components/sidebar";
-import { PageTransition } from "@/components/page-transition";
+import { AppShell } from "@/components/app-shell";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TransacoesProvider } from "@/lib/store/transacoes-store";
 import { ContasProvider } from "@/lib/store/contas-store";
@@ -29,12 +28,7 @@ export default function RootLayout({
         >
           <TransacoesProvider>
             <ContasProvider>
-              <Sidebar />
-              <main className="ml-64 min-h-screen overflow-x-hidden">
-                <div className="container mx-auto px-6 py-8">
-                  <PageTransition>{children}</PageTransition>
-                </div>
-              </main>
+              <AppShell>{children}</AppShell>
               <Toaster position="top-right" richColors />
             </ContasProvider>
           </TransacoesProvider>
