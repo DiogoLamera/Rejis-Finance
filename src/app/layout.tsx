@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Toaster } from "sonner";
 import { AppShell } from "@/components/app-shell";
 import { ThemeProvider } from "@/components/theme-provider";
-import { TransacoesProvider } from "@/lib/store/transacoes-store";
-import { ContasProvider } from "@/lib/store/contas-store";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,12 +24,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <TransacoesProvider>
-            <ContasProvider>
-              <AppShell>{children}</AppShell>
-              <Toaster position="top-right" richColors />
-            </ContasProvider>
-          </TransacoesProvider>
+          <AppShell>{children}</AppShell>
+          <Toaster position="top-right" richColors />
         </ThemeProvider>
       </body>
     </html>
